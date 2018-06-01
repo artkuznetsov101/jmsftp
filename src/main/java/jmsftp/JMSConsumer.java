@@ -4,6 +4,7 @@ import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
@@ -13,7 +14,7 @@ import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
-public class JMSConsumer implements Runnable, AutoCloseable {
+public class JMSConsumer implements Runnable, AutoCloseable, ExceptionListener {
 	Connection connection;
 	Session session;
 	Destination destination;
@@ -22,6 +23,8 @@ public class JMSConsumer implements Runnable, AutoCloseable {
 	public JMSConsumer(ConnectionFactory factory, String destination_name, boolean is_queue) throws JMSException {
 
 		connection = factory.createConnection();
+		connection.setExceptionListener(this);
+		connection.start();
 		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 		if (is_queue)
@@ -31,7 +34,6 @@ public class JMSConsumer implements Runnable, AutoCloseable {
 
 		consumer = session.createConsumer(destination);
 
-		connection.start();
 	}
 
 	@Override
@@ -76,5 +78,10 @@ public class JMSConsumer implements Runnable, AutoCloseable {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void onException(JMSException exception) {
+		exception.printStackTrace();		
 	}
 }
