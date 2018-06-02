@@ -2,86 +2,122 @@ package jmsftp;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
-public class JMSConsumer implements Runnable, AutoCloseable, ExceptionListener {
+public class JMSConsumer implements ExceptionListener, MessageListener {
 	Connection connection;
 	Session session;
 	Destination destination;
 	MessageConsumer consumer;
+	boolean isConnected = false;
+	boolean isReceiving = false;
 
-	public JMSConsumer(ConnectionFactory factory, String destination_name, boolean is_queue) throws JMSException {
-
-		connection = factory.createConnection();
-		connection.setExceptionListener(this);
-		connection.start();
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-		if (is_queue)
-			destination = session.createQueue(destination_name);
-		else
-			destination = session.createTopic(destination_name);
-
-		consumer = session.createConsumer(destination);
-
-	}
-
-	@Override
-	public void close() {
+	public void connect() {
+		System.out.println("jms -> connect");
 		try {
-			consumer.close();
-			session.close();
-			connection.close();
+			connection = JMSConnectionFactory.getIBMMQ().createConnection();
+			connection.setExceptionListener(this);
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			destination = session.createQueue(Settings.QUEUE_NAME);
+			consumer = session.createConsumer(destination);
+			isConnected = true;
+
+			startReceive();
 		} catch (JMSException e) {
-			e.printStackTrace();
+			System.out.println("jms -> connect exception " + e.getMessage());
+			// e.printStackTrace();
 		}
 	}
 
-	@Override
-	public void run() {
-		Message msg;
+	public void startReceive() {
+		System.out.println("jms -> start receive");
 		try {
-			while (!Thread.currentThread().isInterrupted()) {
-				Thread.sleep(100);
-				if ((msg = consumer.receive()) != null) {
-					System.out.print("receive: ");
-					if (msg instanceof TextMessage) {
-						System.out.println(TextMessage.class);
-					} else if (msg instanceof MapMessage) {
-						System.out.println(MapMessage.class);
-					} else if (msg instanceof ObjectMessage) {
-						System.out.println(ObjectMessage.class);
-					} else if (msg instanceof BytesMessage) {
-						System.out.println(BytesMessage.class);
-					} else if (msg instanceof StreamMessage) {
-						System.out.println(StreamMessage.class);
-					}
-					System.out.println(msg);
-				}
-			}
-		} catch (InterruptedException ex) {
-			
-		} catch (JMSException ex) {
-			if (ex.getCause() instanceof InterruptedException) {
+			if (consumer != null)
+				consumer.setMessageListener(this);
+			isReceiving = true;
+			if (connection != null)
+				connection.start();
+		} catch (JMSException e) {
+			System.out.println("jms -> start receive exception " + e.getMessage());
+			// e.printStackTrace();
+		}
+	}
 
-			} else {
-				ex.printStackTrace();
-			}
+	public void stopReceive() {
+		System.out.println("jms -> stop receive");
+		try {
+			if (consumer != null)
+				consumer.setMessageListener(null);
+			if (connection != null)
+				connection.stop();
+
+			isReceiving = false;
+		} catch (JMSException e) {
+			System.out.println("jms -> stop receive exception " + e.getMessage());
+			// e.printStackTrace();
+		} finally {
+			isReceiving = false;
+		}
+	}
+
+	public void disconnect() {
+		System.out.println("jms -> disconnect");
+		try {
+			stopReceive();
+
+			if (consumer != null)
+				consumer.close();
+			if (session != null)
+				session.close();
+			if (connection != null)
+				connection.close();
+		} catch (JMSException e) {
+			System.out.println("jms -> disconnect exception " + e.getMessage());
+			// e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onException(JMSException exception) {
-		exception.printStackTrace();		
+	public void onException(JMSException e) {
+		System.out.println("jms -> onException: " + e.getMessage());
+		// e.printStackTrace();
+
+		disconnect();
+		isConnected = false;
+	}
+
+	@Override
+	public void onMessage(Message message) {
+		System.out.println("jms -> receive " + JMSMessage.getType(message).name() + " message: ");
+		try {
+			switch (JMSMessage.getType(message)) {
+			case TEXT:
+				break;
+			case MAP:
+				break;
+			case OBJECT:
+				break;
+			case BYTES:
+				break;
+			case STREAM:
+				break;
+			case MESSAGE:
+			default:
+				break;
+			}
+			System.out.print(message);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }
