@@ -13,7 +13,7 @@ public class JMSConnectionFactory {
 
 		JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
 		JmsConnectionFactory factory = ff.createConnectionFactory();
-		
+
 		factory.setStringProperty(WMQConstants.WMQ_HOST_NAME, Settings.HOST);
 		factory.setIntProperty(WMQConstants.WMQ_PORT, Settings.PORT);
 		factory.setStringProperty(WMQConstants.WMQ_CHANNEL, Settings.CHANNEL);
@@ -23,7 +23,7 @@ public class JMSConnectionFactory {
 		factory.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
 		factory.setStringProperty(WMQConstants.USERID, Settings.APP_USER);
 		factory.setStringProperty(WMQConstants.PASSWORD, Settings.APP_PASSWORD);
-		
+
 		return factory;
 	}
 }

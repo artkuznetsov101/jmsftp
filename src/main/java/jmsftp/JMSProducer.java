@@ -22,7 +22,7 @@ public class JMSProducer implements AutoCloseable {
 			destination = session.createQueue(destination_name);
 		else
 			destination = session.createTopic(destination_name);
-		
+
 		producer = session.createProducer(destination);
 
 		connection.start();
@@ -36,7 +36,7 @@ public class JMSProducer implements AutoCloseable {
 			connection.close();
 		} catch (JMSException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	public void send(String text) {

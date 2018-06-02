@@ -12,6 +12,6 @@ public class Settings {
 
 	static String APP_USER = "app";
 	static String APP_PASSWORD = "app";
-	
+
 	static int CHECK_CONNECT = 5 * 1000;
 }
