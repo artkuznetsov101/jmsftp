@@ -1,6 +1,7 @@
 package jmsftp;
 
-public class Settings {
+public class JMSSettings {
+	
 	static String HOST = "127.0.0.1";
 	static int PORT = 1414;
 

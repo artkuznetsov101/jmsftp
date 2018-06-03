@@ -12,7 +12,7 @@ public class JMSThread implements Runnable {
 				consumer.connect();
 			}
 			try {
-				Thread.sleep(Settings.CHECK_CONNECT);
+				Thread.sleep(JMSSettings.CHECK_CONNECT);
 			} catch (InterruptedException e) {
 			}
 		}

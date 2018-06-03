@@ -14,15 +14,15 @@ public class JMSConnectionFactory {
 		JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
 		JmsConnectionFactory factory = ff.createConnectionFactory();
 
-		factory.setStringProperty(WMQConstants.WMQ_HOST_NAME, Settings.HOST);
-		factory.setIntProperty(WMQConstants.WMQ_PORT, Settings.PORT);
-		factory.setStringProperty(WMQConstants.WMQ_CHANNEL, Settings.CHANNEL);
+		factory.setStringProperty(WMQConstants.WMQ_HOST_NAME, JMSSettings.HOST);
+		factory.setIntProperty(WMQConstants.WMQ_PORT, JMSSettings.PORT);
+		factory.setStringProperty(WMQConstants.WMQ_CHANNEL, JMSSettings.CHANNEL);
 		factory.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
-		factory.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, Settings.QUEUE_MANAGER);
+		factory.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, JMSSettings.QUEUE_MANAGER);
 		factory.setStringProperty(WMQConstants.WMQ_APPLICATIONNAME, "jms ftp bridge");
 		factory.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
-		factory.setStringProperty(WMQConstants.USERID, Settings.APP_USER);
-		factory.setStringProperty(WMQConstants.PASSWORD, Settings.APP_PASSWORD);
+		factory.setStringProperty(WMQConstants.USERID, JMSSettings.APP_USER);
+		factory.setStringProperty(WMQConstants.PASSWORD, JMSSettings.APP_PASSWORD);
 
 		return factory;
 	}

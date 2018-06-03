@@ -23,7 +23,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(Settings.QUEUE_NAME);
+			destination = session.createQueue(JMSSettings.QUEUE_NAME);
 			consumer = session.createConsumer(destination);
 			isConnected = true;
 
