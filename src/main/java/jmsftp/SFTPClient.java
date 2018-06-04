@@ -1,7 +1,5 @@
 package jmsftp;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,9 +8,11 @@ import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.FileTypeSelector;
 import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 
 public class SFTPClient {
 	private FileSystemManager manager;
@@ -20,46 +20,83 @@ public class SFTPClient {
 	private FileObject local;
 
 	private String filename = "test.txt";
-	private String path = "C:\\!!!";
 
 	public void test() throws FileSystemException {
 
 		connect();
 		info();
 
-		copy(remote.resolveFile(filename));
+		// move(local.resolveFile(filename), remote.resolveFile(filename));
+		// move(remote.resolveFile(filename), local.resolveFile(filename));
+		
+		// copy(local.resolveFile(filename), remote.resolveFile(filename));
+		// delete(local.resolveFile(filename));
+	}
 
-		upload(manager.resolveFile("file:///C:/!!!/test.txt"));
+	public void move(FileObject from, FileObject to) throws FileSystemException {
+		if (from.exists() && from.isFile()) {
+			from.moveTo(to);
+		
+			from.close();
+			to.close();
+		} else
+			throw new FileSystemException("wrong parameters");
 
-		System.out.println("isExists " + remote.exists());
-		System.out.println("isFolder " + remote.isFolder());
-
-		FileObject file = remote.resolveFile("test.txt");
-		System.out.println("isExists " + file.exists());
-		System.out.println("isFolder " + file.isFolder());
-
-		download(file, Paths.get("C:\\!!"));
-
-		System.out.println(remote);
+		// TODO
+		if (to.exists() && to.isFile()) {
+			System.out.println("");
+		}
 	}
 
 	public void copy(FileObject from, FileObject to) throws FileSystemException {
-		if (from.exists() && from.isFile())
-			from.moveTo(to);
-		else
+		if (from.exists() && from.isFile()) {
+			to.copyFrom(from, new FileTypeSelector(FileType.FILE));
+		
+			from.close();
+			to.close();
+		} else
 			throw new FileSystemException("wrong parameters");
-	}
 
+		// TODO
+		if (to.exists() && to.isFile()) {
+			System.out.println("");
+		}
+	}
+		
+	public void delete(FileObject from) throws FileSystemException {
+		if (from.exists() && from.isFile()) {
+			from.delete(new FileTypeSelector(FileType.FILE));
+		
+			from.close();
+		} else
+			throw new FileSystemException("wrong parameters");
+
+		// TODO
+		if (!from.exists() || !from.isFile()) {
+			System.out.println("");
+		}
+	}
+	
 	public void connect() throws FileSystemException {
 		manager = VFS.getManager();
 		// remote = manager.resolveFile(
 		// getSFTPConnection(SFTPSettings.HOST, SFTPSettings.PORT,
 		// SFTPSettings.USERNAME,
 		// SFTPSettings.PASSWORD));
-		remote = manager.resolveFile(getFileConnection());
-		if (!remote.isFolder())
-			throw new FileSystemException("not a remote directory");
 
+		// Setup our SFTP configuration
+		FileSystemOptions opts = new FileSystemOptions();
+		SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
+		SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
+		SftpFileSystemConfigBuilder.getInstance().setTimeout(opts, 10000);
+
+		local = manager.resolveFile(getLocalPath());
+		if (!local.isFolder())
+			throw new FileSystemException("local path is not a directory");
+
+		remote = manager.resolveFile(getRemotePath());
+		if (!remote.isFolder())
+			throw new FileSystemException("remote path is not a directory");
 	}
 
 	private String getRemoteSFTP(String host, String port, String username, String password) {
@@ -70,22 +107,8 @@ public class SFTPClient {
 		return "file:///C:/!!";
 	}
 
-	public void download(FileObject src, Path local) throws FileSystemException {
-		// LocalFile localFileObject = (LocalFile)
-		// manager.resolveFile(local.toUri().toString());
-		// try {
-		// localFileObject.copyFrom(file, new AllFileSelector());
-		// } finally {
-		// localFileObject.close();
-		// file.close();
-		// }
-
-		FileObject dest = manager.resolveFile("C:\\!!");
-		if (dest.exists() && dest.getType() == FileType.FOLDER) {
-			dest = dest.resolveFile(src.getName().getBaseName());
-		}
-
-		dest.copyFrom(src, Selectors.SELECT_ALL);
+	private String getLocalPath() {
+		return "file:///C:/!!!";
 	}
 
 	public void info() throws FileSystemException {
