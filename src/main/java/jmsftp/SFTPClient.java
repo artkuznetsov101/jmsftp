@@ -62,11 +62,11 @@ public class SFTPClient {
 
 	}
 
-	private String getRemotePath(String host, String port, String username, String password) {
+	private String getRemoteSFTP(String host, String port, String username, String password) {
 		return String.format("sftp://%s:%s@%s:%s", username, password, host, port);
 	}
 
-	private String getLocalPath() {
+	private String getRemotePath() {
 		return "file:///C:/!!";
 	}
 
