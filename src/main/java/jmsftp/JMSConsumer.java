@@ -40,7 +40,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
 			session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(Settings.JMS.QUEUE_NAME);
+			destination = session.createQueue(Config.JMS.QUEUE_NAME);
 			consumer = session.createConsumer(destination);
 			isConnected = true;
 
@@ -112,17 +112,18 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	public void onMessage(Message message) {
 		System.out.println("jms -> receive " + JMSMessage.getType(message).name() + " message: ");
 		try {
-			String filename = JMSMessage.saveToFile(Settings.COMMON.TEMP_DIR, message);
+			String filename = JMSMessage.saveToFile(Config.COMMON.TEMP_DIR, message);
 			client.upload(filename);
 			session.commit();
 			System.out.print(message);
 		} catch (Exception e) {
 			try {
 				session.rollback();
-				Thread.sleep(Settings.JMS.CONNECT_TIMEOUT);
+				Thread.sleep(Config.JMS.CONNECT_TIMEOUT);
 			} catch (JMSException | InterruptedException e1) {
 			}
-			e.printStackTrace();
+			// TODO log
+			// e.printStackTrace();
 		}
 	}
 }

@@ -78,6 +78,14 @@
 	</build>
 
 	<dependencies>
+
+		<!-- config file support -->
+		<dependency>
+			<groupId>org.ini4j</groupId>
+			<artifactId>ini4j</artifactId>
+			<version>0.5.4</version>
+		</dependency>
+
 		<!-- jms interface -->
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>

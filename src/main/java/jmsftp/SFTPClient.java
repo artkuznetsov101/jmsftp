@@ -29,6 +29,7 @@ public class SFTPClient {
 	}
 
 	public void upload(String filename) throws FileSystemException {
+		init();
 		move(local.resolveFile(filename), remote.resolveFile(filename));
 	}
 
@@ -85,16 +86,24 @@ public class SFTPClient {
 		SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
 		SftpFileSystemConfigBuilder.getInstance().setTimeout(opts, 10000);
 
-		local = manager.resolveFile(getLocalPath());
-		if (!local.isFolder())
-			throw new FileSystemException("local path is not a directory");
-
-		remote = manager.resolveFile(
-				getRemoteSFTP(Settings.SFTP.HOST, Settings.SFTP.PORT, Settings.SFTP.USERNAME, Settings.SFTP.PASSWORD));
-		if (!remote.isFolder())
-			throw new FileSystemException("remote path is not a directory");
-
 		info();
+		init();
+	}
+
+	public void init() throws FileSystemException {
+
+		if (local == null) {
+			local = manager.resolveFile(getLocalPath());
+			if (!local.isFolder())
+				throw new FileSystemException("local path is not a directory");
+		}
+		
+		if (remote == null) {
+			remote = manager.resolveFile(getRemoteSFTP(Config.SFTP.HOST, Config.SFTP.PORT, Config.SFTP.USERNAME,
+					Config.SFTP.PASSWORD));
+			if (!remote.isFolder())
+				throw new FileSystemException("remote path is not a directory");
+		}
 	}
 
 	private String getRemoteSFTP(String host, String port, String username, String password) {
@@ -102,7 +111,7 @@ public class SFTPClient {
 	}
 
 	private String getLocalPath() {
-		return Settings.COMMON.TEMP_DIR;
+		return Config.COMMON.TEMP_DIR;
 	}
 
 	public void info() throws FileSystemException {

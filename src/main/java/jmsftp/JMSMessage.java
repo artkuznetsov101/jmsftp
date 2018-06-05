@@ -62,8 +62,8 @@ public class JMSMessage {
 	}
 
 	public static String getFileName(Message message) throws JMSException {
-		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Settings.COMMON.FILE_NAME
-				+ "_" + getType(message) + "." + Settings.COMMON.FILE_EXTENSION;
+		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Config.COMMON.FILE_NAME
+				+ "_" + getType(message) + "." + Config.COMMON.FILE_EXTENSION;
 	}
 
 	public static Type getType(Message message) {
