@@ -3,15 +3,14 @@ package jmsftp;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+			
+		//TODO check temp dir exist
+		
+		
+		JMSThread jms = new JMSThread();
+		Thread jmsThread = new Thread(jms);
+		jmsThread.start();
 
-		SFTPClient sftp = new SFTPClient();
-		sftp.test();
-		
-		
-//		JMSThread jms = new JMSThread();
-//		Thread jmsThread = new Thread(jms);
-//		jmsThread.start();
-//
 //		// start receiving
 //		Thread.sleep(15 * 1000);
 //
@@ -25,6 +24,6 @@ public class Main {
 //
 //		// stop receiving and close
 //		jms.close();
-//		jmsThread.join();
+		jmsThread.join();
 	}
 }

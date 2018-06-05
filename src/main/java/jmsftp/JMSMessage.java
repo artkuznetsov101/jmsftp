@@ -1,6 +1,14 @@
 package jmsftp;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.jms.BytesMessage;
+import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
@@ -11,6 +19,51 @@ public class JMSMessage {
 
 	public enum Type {
 		MESSAGE, TEXT, MAP, OBJECT, BYTES, STREAM
+	}
+
+	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+	public static String saveToFile(String tempDir, Message message) throws JMSException, IOException {
+
+		String filename = getFileName(message);
+		String path = Paths.get(tempDir, filename).toString();
+
+		byte[] data = null;
+
+		switch (JMSMessage.getType(message)) {
+		case TEXT:
+			data = ((TextMessage) message).getText().getBytes();
+			break;
+		case MAP:
+			break;
+		case OBJECT:
+			break;
+		case BYTES:
+			data = new byte[(int) ((BytesMessage) message).getBodyLength()];
+			((BytesMessage) message).readBytes(data);
+			break;
+		case STREAM:
+			break;
+		case MESSAGE:
+		default:
+			break;
+		}
+		if (data != null) {
+			Files.write(Paths.get(path), data, StandardOpenOption.CREATE);
+		} else {
+			System.out.println("jms -> empty jms message received");
+			Files.createFile(Paths.get(path));
+		}
+		return filename;
+	}
+
+	public static String getTimestamp() {
+		return formatter.format(new Date());
+	}
+
+	public static String getFileName(Message message) throws JMSException {
+		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Settings.COMMON.FILE_NAME
+				+ "_" + getType(message) + "." + Settings.COMMON.FILE_EXTENSION;
 	}
 
 	public static Type getType(Message message) {

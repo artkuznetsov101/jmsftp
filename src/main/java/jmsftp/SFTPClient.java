@@ -19,24 +19,23 @@ public class SFTPClient {
 	private FileObject remote;
 	private FileObject local;
 
-	private String filename = "test.txt";
-
-	public void test() throws FileSystemException {
-
-		connect();
-		info();
+	public SFTPClient() {
 
 		// move(local.resolveFile(filename), remote.resolveFile(filename));
 		// move(remote.resolveFile(filename), local.resolveFile(filename));
-		
+
 		// copy(local.resolveFile(filename), remote.resolveFile(filename));
 		// delete(local.resolveFile(filename));
+	}
+
+	public void upload(String filename) throws FileSystemException {
+		move(local.resolveFile(filename), remote.resolveFile(filename));
 	}
 
 	public void move(FileObject from, FileObject to) throws FileSystemException {
 		if (from.exists() && from.isFile()) {
 			from.moveTo(to);
-		
+
 			from.close();
 			to.close();
 		} else
@@ -51,7 +50,7 @@ public class SFTPClient {
 	public void copy(FileObject from, FileObject to) throws FileSystemException {
 		if (from.exists() && from.isFile()) {
 			to.copyFrom(from, new FileTypeSelector(FileType.FILE));
-		
+
 			from.close();
 			to.close();
 		} else
@@ -62,11 +61,11 @@ public class SFTPClient {
 			System.out.println("");
 		}
 	}
-		
+
 	public void delete(FileObject from) throws FileSystemException {
 		if (from.exists() && from.isFile()) {
 			from.delete(new FileTypeSelector(FileType.FILE));
-		
+
 			from.close();
 		} else
 			throw new FileSystemException("wrong parameters");
@@ -76,15 +75,11 @@ public class SFTPClient {
 			System.out.println("");
 		}
 	}
-	
+
 	public void connect() throws FileSystemException {
 		manager = VFS.getManager();
-		// remote = manager.resolveFile(
-		// getSFTPConnection(SFTPSettings.HOST, SFTPSettings.PORT,
-		// SFTPSettings.USERNAME,
-		// SFTPSettings.PASSWORD));
 
-		// Setup our SFTP configuration
+		// setup our SFTP configuration
 		FileSystemOptions opts = new FileSystemOptions();
 		SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, "no");
 		SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
@@ -94,21 +89,20 @@ public class SFTPClient {
 		if (!local.isFolder())
 			throw new FileSystemException("local path is not a directory");
 
-		remote = manager.resolveFile(getRemotePath());
+		remote = manager.resolveFile(
+				getRemoteSFTP(Settings.SFTP.HOST, Settings.SFTP.PORT, Settings.SFTP.USERNAME, Settings.SFTP.PASSWORD));
 		if (!remote.isFolder())
 			throw new FileSystemException("remote path is not a directory");
+
+		info();
 	}
 
 	private String getRemoteSFTP(String host, String port, String username, String password) {
 		return String.format("sftp://%s:%s@%s:%s", username, password, host, port);
 	}
 
-	private String getRemotePath() {
-		return "file:///C:/!!";
-	}
-
 	private String getLocalPath() {
-		return "file:///C:/!!!";
+		return Settings.COMMON.TEMP_DIR;
 	}
 
 	public void info() throws FileSystemException {

@@ -2,17 +2,17 @@ package jmsftp;
 
 public class JMSThread implements Runnable {
 	JMSConsumer consumer = new JMSConsumer();
+
 	boolean isClosed = false;
 
 	@Override
 	public void run() {
-
 		while (!isClosed) {
 			if (!consumer.isConnected) {
 				consumer.connect();
 			}
 			try {
-				Thread.sleep(JMSSettings.CHECK_CONNECT);
+				Thread.sleep(Settings.JMS.CONNECT_TIMEOUT);
 			} catch (InterruptedException e) {
 			}
 		}
