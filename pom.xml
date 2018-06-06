@@ -100,19 +100,26 @@
 			<version>9.0.5.0</version>
 		</dependency>
 
-		<!-- sftp -->
+		<!-- vfs interface -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-vfs2</artifactId>
 			<version>2.2</version>
 		</dependency>
 
-		<!-- sftp -->
+		<!-- ftp implementation -->
 		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<version>0.1.54</version>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.6</version>
 		</dependency>
+
+		<!-- sftp implementation -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.jcraft</groupId> -->
+		<!-- <artifactId>jsch</artifactId> -->
+		<!-- <version>0.1.54</version> -->
+		<!-- </dependency> -->
 
 	</dependencies>
 

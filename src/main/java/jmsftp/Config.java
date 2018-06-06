@@ -5,20 +5,27 @@ import org.ini4j.Wini;
 public class Config {
 
 	public static String NAME = "jmsftp.ini";
-	
+
 	public static class COMMON {
-		static String TEMP_DIR;
+
+		static boolean JMS2FTP;
+		static boolean FTP2JMS;
 
 		static String FILE_NAME;
 		static String FILE_EXTENSION;
+
+		static int TIMEOUT;
 	}
 
-	public static class SFTP {
+	public static class FTP {
 		static String HOST;
 		static String PORT;
 
 		static String USERNAME;
 		static String PASSWORD;
+
+		static String FTP_DIR;
+		static String TEMP_DIR;
 	}
 
 	public static class JMS {
@@ -30,30 +37,39 @@ public class Config {
 
 		static String QUEUE_MANAGER;
 		static String CHANNEL;
-		static String QUEUE_NAME;
+		static String RECV_QUEUE_NAME;
+		static String SEND_QUEUE_NAME;
 
-		static int CONNECT_TIMEOUT;
-		static int ROLLBACK_TIMEOUT;
+		static String FTP_DIR;
+		static String TEMP_DIR;
 	}
 
 	public static void setConfig(Wini ini) {
 		// COMMON section
-		if ((Config.COMMON.TEMP_DIR = ini.get("COMMON", "TEMP_DIR")) == null)
-			throw new IllegalArgumentException("COMMON->TEMP_DIR parameter not specified in ini file. Exit");
 		if ((Config.COMMON.FILE_NAME = ini.get("COMMON", "FILE_NAME")) == null)
 			throw new IllegalArgumentException("COMMON->FILE_NAME parameter not specified in ini file. Exit");
 		if ((Config.COMMON.FILE_EXTENSION = ini.get("COMMON", "FILE_EXTENSION")) == null)
 			throw new IllegalArgumentException("COMMON->FILE_EXTENSION parameter not specified in ini file. Exit");
 
-		// SFTP section
-		if ((Config.SFTP.HOST = ini.get("SFTP", "HOST")) == null)
-			throw new IllegalArgumentException("SFTP->HOST parameter not specified in ini file. Exit");
-		if ((Config.SFTP.PORT = ini.get("SFTP", "PORT")) == null)
-			throw new IllegalArgumentException("SFTP->PORT parameter not specified in ini file. Exit");
-		if ((Config.SFTP.USERNAME = ini.get("SFTP", "USERNAME")) == null)
-			throw new IllegalArgumentException("SFTP->USERNAME parameter not specified in ini file. Exit");
-		if ((Config.SFTP.PASSWORD = ini.get("SFTP", "PASSWORD")) == null)
-			throw new IllegalArgumentException("SFTP->PASSWORD parameter not specified in ini file. Exit");
+		Config.COMMON.JMS2FTP = ini.get("COMMON", "JMS2FTP", Boolean.TYPE).booleanValue();
+		Config.COMMON.FTP2JMS = ini.get("COMMON", "FTP2JMS", Boolean.TYPE).booleanValue();
+
+		if ((Config.COMMON.TIMEOUT = ini.get("COMMON", "TIMEOUT", Integer.TYPE).intValue()) == 0)
+			throw new IllegalArgumentException("COMMON->TIMEOUT parameter not specified in ini file. Exit");
+
+		// FTP section
+		if ((Config.FTP.HOST = ini.get("FTP", "HOST")) == null)
+			throw new IllegalArgumentException("FTP->HOST parameter not specified in ini file. Exit");
+		if ((Config.FTP.PORT = ini.get("FTP", "PORT")) == null)
+			throw new IllegalArgumentException("FTP->PORT parameter not specified in ini file. Exit");
+		if ((Config.FTP.USERNAME = ini.get("FTP", "USERNAME")) == null)
+			throw new IllegalArgumentException("FTP->USERNAME parameter not specified in ini file. Exit");
+		if ((Config.FTP.PASSWORD = ini.get("FTP", "PASSWORD")) == null)
+			throw new IllegalArgumentException("FTP->PASSWORD parameter not specified in ini file. Exit");
+		if ((Config.FTP.FTP_DIR = ini.get("FTP", "FTP_DIR")) == null)
+			throw new IllegalArgumentException("FTP->FTP_DIR parameter not specified in ini file. Exit");
+		if ((Config.FTP.TEMP_DIR = ini.get("FTP", "TEMP_DIR")) == null)
+			throw new IllegalArgumentException("FTP->TEMP_DIR parameter not specified in ini file. Exit");
 
 		// JMS section
 		if ((Config.JMS.HOST = ini.get("JMS", "HOST")) == null)
@@ -69,11 +85,13 @@ public class Config {
 			throw new IllegalArgumentException("JMS->QUEUE_MANAGER parameter not specified in ini file. Exit");
 		if ((Config.JMS.CHANNEL = ini.get("JMS", "CHANNEL")) == null)
 			throw new IllegalArgumentException("JMS->CHANNEL parameter not specified in ini file. Exit");
-		if ((Config.JMS.QUEUE_NAME = ini.get("JMS", "QUEUE_NAME")) == null)
-			throw new IllegalArgumentException("JMS->QUEUE_NAME parameter not specified in ini file. Exit");
-		if ((Config.JMS.CONNECT_TIMEOUT = ini.get("JMS", "CONNECT_TIMEOUT", Integer.TYPE).intValue()) == 0)
-			throw new IllegalArgumentException("JMS->CONNECT_TIMEOUT parameter not specified in ini file. Exit");
-		if ((Config.JMS.ROLLBACK_TIMEOUT = ini.get("JMS", "ROLLBACK_TIMEOUT", Integer.TYPE).intValue()) == 0)
-			throw new IllegalArgumentException("JMS->ROLLBACK_TIMEOUT parameter not specified in ini file. Exit");
+		if ((Config.JMS.RECV_QUEUE_NAME = ini.get("JMS", "RECV_QUEUE_NAME")) == null)
+			throw new IllegalArgumentException("JMS->RECV_QUEUE_NAME parameter not specified in ini file. Exit");
+		if ((Config.JMS.SEND_QUEUE_NAME = ini.get("JMS", "SEND_QUEUE_NAME")) == null)
+			throw new IllegalArgumentException("JMS->SEND_QUEUE_NAME parameter not specified in ini file. Exit");
+		if ((Config.JMS.TEMP_DIR = ini.get("JMS", "TEMP_DIR")) == null)
+			throw new IllegalArgumentException("JMS->TEMP_DIR parameter not specified in ini file. Exit");
+		if ((Config.JMS.FTP_DIR = ini.get("JMS", "FTP_DIR")) == null)
+			throw new IllegalArgumentException("JMS->FTP_DIR parameter not specified in ini file. Exit");
 	}
 }

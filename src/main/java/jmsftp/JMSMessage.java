@@ -57,13 +57,18 @@ public class JMSMessage {
 		return filename;
 	}
 
+	public static TextMessage loadFromFile(String path, TextMessage message) throws JMSException, IOException {
+		message.setText(new String(Files.readAllBytes(Paths.get(path))));
+		return message;
+	}
+
 	public static String getTimestamp() {
 		return formatter.format(new Date());
 	}
 
 	public static String getFileName(Message message) throws JMSException {
-		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Config.COMMON.FILE_NAME
-				+ "_" + getType(message) + "." + Config.COMMON.FILE_EXTENSION;
+		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Config.COMMON.FILE_NAME + "_"
+				+ getType(message) + "." + Config.COMMON.FILE_EXTENSION;
 	}
 
 	public static Type getType(Message message) {

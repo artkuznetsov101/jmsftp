@@ -15,24 +15,33 @@ public class Main {
 
 		// TODO check temp dir exist
 
-		//start jms2sftp thread
-		JMSThread jms = new JMSThread();
-		Thread jmsThread = new Thread(jms);
-		jmsThread.start();
+		// start ftp2jms thread
+		FTPThread ftp = null;
+		Thread ftpThread = null;
+		if (Config.COMMON.FTP2JMS) {
+			ftp = new FTPThread();
+			ftpThread = new Thread(ftp);
+			ftpThread.start();
+		}
 
-		// // start receiving
-		// Thread.sleep(15 * 1000);
-		//
-		// // stop receiving
-		// jms.stop();
-		// Thread.sleep(15 * 1000);
-		//
-		// // start receiving
-		// jms.start();
-		// Thread.sleep(15 * 1000);
-		//
-		// // stop receiving and close
+		// start jms2sftp thread
+		JMSThread jms = null;
+		Thread jmsThread = null;
+		if (Config.COMMON.JMS2FTP) {
+			jms = new JMSThread();
+			jmsThread = new Thread(jms);
+			jmsThread.start();
+		}
+
+		// Thread.sleep(60 * 1000);
+		// sftp.close();
 		// jms.close();
-		jmsThread.join();
+
+		if (Config.COMMON.FTP2JMS) {
+			ftpThread.join();
+		}
+		if (Config.COMMON.JMS2FTP) {
+			jmsThread.join();
+		}
 	}
 }
