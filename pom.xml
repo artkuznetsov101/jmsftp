@@ -114,12 +114,19 @@
 			<version>3.6</version>
 		</dependency>
 
-		<!-- sftp implementation -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.jcraft</groupId> -->
-		<!-- <artifactId>jsch</artifactId> -->
-		<!-- <version>0.1.54</version> -->
-		<!-- </dependency> -->
+		<!-- logging api -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+		
+		<!-- logging implementation -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.11.0</version>
+		</dependency>
 
 	</dependencies>
 

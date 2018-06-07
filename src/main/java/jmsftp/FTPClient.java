@@ -14,20 +14,15 @@ import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.FileTypeSelector;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.provider.ftp.FtpFileSystemConfigBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FTPClient {
+	private static final Logger log = LogManager.getLogger();
+
 	FileSystemManager manager;
 	FileObject remote;
 	FileObject local;
-
-	public FTPClient() {
-
-		// move(local.resolveFile(filename), remote.resolveFile(filename));
-		// move(remote.resolveFile(filename), local.resolveFile(filename));
-
-		// copy(local.resolveFile(filename), remote.resolveFile(filename));
-		// delete(local.resolveFile(filename));
-	}
 
 	public void upload(String filename) throws FileSystemException {
 		init(Config.JMS.TEMP_DIR, Config.JMS.FTP_DIR);
@@ -53,7 +48,7 @@ public class FTPClient {
 				}
 			}
 		} catch (FileSystemException e) {
-			System.out.println("ftp2jms ->  ftp connect exception " + e.getMessage());
+			log.error("ftp2jms ->  ftp connect exception " + e.getMessage());
 		}
 		return null;
 	}
@@ -113,14 +108,9 @@ public class FTPClient {
 	public void connect(String temp, String ftp) throws FileSystemException {
 		manager = VFS.getManager();
 
-		// setup our FTP configuration
 		FileSystemOptions opts = new FileSystemOptions();
 		FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
 		FtpFileSystemConfigBuilder.getInstance().setConnectTimeout(opts, Config.COMMON.TIMEOUT);
-
-		// FtpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts,
-		// "no");
-		// FtpFileSystemConfigBuilder.getInstance().setTimeout(opts, 10000);
 
 		init(temp, ftp);
 	}
@@ -141,7 +131,7 @@ public class FTPClient {
 					throw new FileSystemException("remote path is not a directory");
 			}
 		} catch (Exception e) {
-			System.out.println("ftp2jms ->  ftp connect exception" + e.getMessage());
+			log.error("ftp2jms ->  ftp connect exception" + e.getMessage());
 		}
 	}
 
@@ -149,12 +139,12 @@ public class FTPClient {
 		return String.format("ftp://%s:%s@%s:%s/%s", username, password, host, port, dir);
 	}
 
-	private String getRemoteTest(String dir) {
-		return String.format("C:\\!ftp\\%s", dir);
-	}
+	// private String getRemoteTest(String dir) {
+	// return String.format("C:\\!ftp\\%s", dir);
+	// }
 
 	public void info() throws FileSystemException {
-		System.out.println("Default manager: \"" + manager.getClass().getName() + "\" " + "version "
+		log.info("default manager: \"" + manager.getClass().getName() + "\" " + "version "
 				+ getVersion(manager.getClass()));
 		String[] schemes = manager.getSchemes();
 		List<String> virtual = new ArrayList<>();
@@ -171,10 +161,10 @@ public class FTPClient {
 			}
 		}
 		if (!physical.isEmpty()) {
-			System.out.println("  Provider Schemes: " + physical);
+			log.info("  provider Schemes: " + physical);
 		}
 		if (!virtual.isEmpty()) {
-			System.out.println("   Virtual Schemes: " + virtual);
+			log.info("   virtual Schemes: " + virtual);
 		}
 	}
 

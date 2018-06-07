@@ -2,13 +2,11 @@ package jmsftp;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
 public class JMSConnectionFactory {
-
 	public static ConnectionFactory getIBMMQ() throws JMSException {
 
 		JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);

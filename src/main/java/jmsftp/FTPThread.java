@@ -4,8 +4,13 @@ import java.io.IOException;
 
 import javax.jms.JMSException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class FTPThread implements Runnable {
-	JMSProducer producer = new JMSProducer();
+    private static final Logger log = LogManager.getLogger();
+
+    JMSProducer producer = new JMSProducer();
 
 	boolean isClosed = false;
 
@@ -23,13 +28,13 @@ public class FTPThread implements Runnable {
 			
 			try {
 				if (producer.isConnected == true && (file = producer.client.get()) != null) {
-					System.out.println("ftp2jms ->  ftp get: " + file);
+					log.info("ftp2jms ->  ftp get: " + file);
 					producer.send(Config.FTP.TEMP_DIR, file);
-					System.out.println("ftp2jms ->  jms put: " + file);
+					log.info("ftp2jms ->  jms put: " + file);
 					producer.client.delete(Config.FTP.TEMP_DIR, file);
 					producer.client.delete(file);
 					producer.session.commit();
-					System.out.println("ftp2jms ->   commit: " + file);
+					log.info("ftp2jms ->   commit: " + file);
 				} else {
 					try {
 						Thread.sleep(Config.COMMON.TIMEOUT);
@@ -39,7 +44,7 @@ public class FTPThread implements Runnable {
 			} catch (JMSException | IOException e) {
 				try {
 					producer.session.rollback();
-					System.out.println("ftp2jms -> rollback");
+					log.error("ftp2jms -> rollback");
 					try {
 						Thread.sleep(Config.COMMON.TIMEOUT);
 					} catch (InterruptedException e1) {

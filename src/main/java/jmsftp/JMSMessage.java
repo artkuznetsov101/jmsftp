@@ -15,7 +15,11 @@ import javax.jms.ObjectMessage;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class JMSMessage {
+    private static final Logger log = LogManager.getLogger();
 
 	public enum Type {
 		MESSAGE, TEXT, MAP, OBJECT, BYTES, STREAM
@@ -51,7 +55,7 @@ public class JMSMessage {
 		if (data != null) {
 			Files.write(Paths.get(path), data, StandardOpenOption.CREATE);
 		} else {
-			System.out.println("jms -> empty jms message received");
+			log.info("jms -> empty jms message received");
 			Files.createFile(Paths.get(path));
 		}
 		return filename;

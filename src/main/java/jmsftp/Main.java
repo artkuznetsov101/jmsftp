@@ -1,7 +1,6 @@
 package jmsftp;
 
 import java.io.File;
-
 import org.ini4j.Wini;
 
 public class Main {
@@ -20,7 +19,7 @@ public class Main {
 		Thread ftpThread = null;
 		if (Config.COMMON.FTP2JMS) {
 			ftp = new FTPThread();
-			ftpThread = new Thread(ftp);
+			ftpThread = new Thread(ftp, "ftp2jms thread");
 			ftpThread.start();
 		}
 
@@ -29,7 +28,7 @@ public class Main {
 		Thread jmsThread = null;
 		if (Config.COMMON.JMS2FTP) {
 			jms = new JMSThread();
-			jmsThread = new Thread(jms);
+			jmsThread = new Thread(jms, "jms2ftp thread");
 			jmsThread.start();
 		}
 

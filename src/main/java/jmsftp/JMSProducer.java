@@ -12,8 +12,11 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class JMSProducer implements ExceptionListener {
+    private static final Logger log = LogManager.getLogger();
 
 	FTPClient client = new FTPClient();
 
@@ -36,7 +39,7 @@ public class JMSProducer implements ExceptionListener {
 	}
 
 	public void connect() {
-		System.out.println("ftp2jms ->  jms connect");
+		log.info("ftp2jms ->  jms connect");
 		try {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
@@ -45,13 +48,12 @@ public class JMSProducer implements ExceptionListener {
 			producer = session.createProducer(destination);
 			isConnected = true;
 		} catch (JMSException e) {
-			System.out.println("ftp2jms ->  jms connect exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("ftp2jms ->  jms connect exception " + e.getMessage());
 		}
 	}
 
 	public void disconnect() {
-		System.out.println("ftp2jms ->  jms disconnect");
+		log.info("ftp2jms ->  jms disconnect");
 		try {
 			if (producer != null)
 				producer.close();
@@ -60,8 +62,7 @@ public class JMSProducer implements ExceptionListener {
 			if (connection != null)
 				connection.close();
 		} catch (JMSException e) {
-			System.out.println("ftp2jms ->  jms disconnect exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("ftp2jms ->  jms disconnect exception " + e.getMessage());
 		}
 	}
 
@@ -71,9 +72,8 @@ public class JMSProducer implements ExceptionListener {
 
 	@Override
 	public void onException(JMSException e) {
-		System.out.println("ftp2jms ->  jms onException: " + e.getMessage());
-		// e.printStackTrace();
-
+		log.error("ftp2jms ->  jms onException: " + e.getMessage());
+		
 		disconnect();
 		isConnected = false;
 	}

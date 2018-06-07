@@ -10,9 +10,12 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class JMSConsumer implements ExceptionListener, MessageListener {
-
+    private static final Logger log = LogManager.getLogger();
+    
 	FTPClient client = new FTPClient();
 
 	Connection connection;
@@ -30,12 +33,11 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 		try {
 			client.connect(Config.JMS.TEMP_DIR, Config.JMS.FTP_DIR);
 		} catch (FileSystemException e) {
-			e.printStackTrace();
 		}
 	}
 
 	public void connect() {
-		System.out.println("jms2ftp ->  jms connect");
+		log.info("jms2ftp ->  jms connect");
 		try {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
@@ -46,13 +48,12 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 
 			startReceive();
 		} catch (JMSException e) {
-			System.out.println("jms2ftp ->  jms connect exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("jms2ftp ->  jms connect exception " + e.getMessage());
 		}
 	}
 
 	public void startReceive() {
-		System.out.println("jms2ftp ->  jms start receive");
+		log.info("jms2ftp ->  jms start receive");
 		try {
 			if (consumer != null)
 				consumer.setMessageListener(this);
@@ -60,13 +61,12 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			if (connection != null)
 				connection.start();
 		} catch (JMSException e) {
-			System.out.println("jms2ftp ->  jms start receive exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("jms2ftp ->  jms start receive exception " + e.getMessage());
 		}
 	}
 
 	public void stopReceive() {
-		System.out.println("jms2ftp ->  jms stop receive");
+		log.info("jms2ftp ->  jms stop receive");
 		try {
 			if (consumer != null)
 				consumer.setMessageListener(null);
@@ -75,15 +75,14 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 
 			isReceiving = false;
 		} catch (JMSException e) {
-			System.out.println("jms2ftp ->  jms stop receive exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("jms2ftp ->  jms stop receive exception " + e.getMessage());
 		} finally {
 			isReceiving = false;
 		}
 	}
 
 	public void disconnect() {
-		System.out.println("jms2ftp ->  jms disconnect");
+		log.info("jms2ftp ->  jms disconnect");
 		try {
 			stopReceive();
 
@@ -94,15 +93,13 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			if (connection != null)
 				connection.close();
 		} catch (JMSException e) {
-			System.out.println("jms2ftp ->  jms disconnect exception " + e.getMessage());
-			// e.printStackTrace();
+			log.error("jms2ftp ->  jms disconnect exception " + e.getMessage());
 		}
 	}
 
 	@Override
 	public void onException(JMSException e) {
-		System.out.println("jms2ftp ->  jms onException: " + e.getMessage());
-		// e.printStackTrace();
+		log.error("jms2ftp ->  jms onException: " + e.getMessage());
 
 		disconnect();
 		isConnected = false;
@@ -111,24 +108,22 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	@Override
 	public void onMessage(Message message) {
 		try {
-			System.out.println("jms2ftp ->  jms get: " + message.getJMSMessageID());
+			log.info("jms2ftp ->  jms get: " + message.getJMSMessageID());
 			String filename = JMSMessage.saveToFile(Config.JMS.TEMP_DIR, message);
 			client.upload(filename);
-			System.out.println("jms2ftp ->  ftp put: " + message.getJMSMessageID());
+			log.info("jms2ftp ->  ftp put: " + message.getJMSMessageID());
 			session.commit();
-			System.out.println("jms2ftp ->   commit: " + message.getJMSMessageID());
+			log.info("jms2ftp ->   commit: " + message.getJMSMessageID());
 		} catch (Exception e) {
 			try {
 				session.rollback();
-				System.out.println("jms2ftp -> rollback: " + message.getJMSMessageID());
+				log.error("jms2ftp -> rollback: " + message.getJMSMessageID());
 				try {
 					Thread.sleep(Config.COMMON.TIMEOUT);
 				} catch (InterruptedException e1) {
 				}
 			} catch (JMSException e1) {
 			}
-			// TODO log
-			// e.printStackTrace();
 		}
 	}
 }
