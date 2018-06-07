@@ -53,7 +53,7 @@ public class FTPClient {
 				}
 			}
 		} catch (FileSystemException e) {
-			System.out.println("ftp2jms ->  ftp no connection");
+			System.out.println("ftp2jms ->  ftp connect exception " + e.getMessage());
 		}
 		return null;
 	}
@@ -140,8 +140,8 @@ public class FTPClient {
 				if (!remote.isFolder())
 					throw new FileSystemException("remote path is not a directory");
 			}
-		} catch (Exception ignored) {
-			System.out.println("ftp2jms ->  ftp no connection");
+		} catch (Exception e) {
+			System.out.println("ftp2jms ->  ftp connect exception" + e.getMessage());
 		}
 	}
 
