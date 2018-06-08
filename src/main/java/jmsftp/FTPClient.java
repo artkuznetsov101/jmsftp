@@ -48,7 +48,7 @@ public class FTPClient {
 				}
 			}
 		} catch (FileSystemException e) {
-			log.error("ftp2jms ->  ftp connect exception " + e.getMessage());
+			log.error("ftp2jms ->  ftp connect exception: " + e.getMessage());
 		}
 		return null;
 	}
@@ -120,7 +120,7 @@ public class FTPClient {
 			if (local == null) {
 				local = manager.resolveFile(temp);
 				if (!local.isFolder())
-					throw new FileSystemException("local path is not a directory");
+					throw new FileSystemException("local path is not a directory: " + temp);
 			}
 
 			if (remote == null) {
@@ -128,10 +128,10 @@ public class FTPClient {
 				remote = manager.resolveFile(
 						getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp));
 				if (!remote.isFolder())
-					throw new FileSystemException("remote path is not a directory");
+					throw new FileSystemException("remote path is not a directory" + ftp);
 			}
 		} catch (Exception e) {
-			log.error("ftp2jms ->  ftp connect exception" + e.getMessage());
+			log.error("ftp2jms ->  ftp connect exception: " + e.getMessage());
 		}
 	}
 

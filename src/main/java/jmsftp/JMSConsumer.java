@@ -14,8 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class JMSConsumer implements ExceptionListener, MessageListener {
-    private static final Logger log = LogManager.getLogger();
-    
+	private static final Logger log = LogManager.getLogger();
+
 	FTPClient client = new FTPClient();
 
 	Connection connection;
@@ -48,7 +48,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 
 			startReceive();
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms connect exception " + e.getMessage());
+			log.error("jms2ftp ->  jms connect exception: " + e.getMessage());
 		}
 	}
 
@@ -61,7 +61,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			if (connection != null)
 				connection.start();
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms start receive exception " + e.getMessage());
+			log.error("jms2ftp ->  jms start receive exception: " + e.getMessage());
 		}
 	}
 
@@ -75,7 +75,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 
 			isReceiving = false;
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms stop receive exception " + e.getMessage());
+			log.error("jms2ftp ->  jms stop receive exception: " + e.getMessage());
 		} finally {
 			isReceiving = false;
 		}
@@ -93,7 +93,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			if (connection != null)
 				connection.close();
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms disconnect exception " + e.getMessage());
+			log.error("jms2ftp ->  jms disconnect exception: " + e.getMessage());
 		}
 	}
 

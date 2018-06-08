@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class JMSProducer implements ExceptionListener {
-    private static final Logger log = LogManager.getLogger();
+	private static final Logger log = LogManager.getLogger();
 
 	FTPClient client = new FTPClient();
 
@@ -48,7 +48,7 @@ public class JMSProducer implements ExceptionListener {
 			producer = session.createProducer(destination);
 			isConnected = true;
 		} catch (JMSException e) {
-			log.error("ftp2jms ->  jms connect exception " + e.getMessage());
+			log.error("ftp2jms ->  jms connect exception: " + e.getMessage());
 		}
 	}
 
@@ -62,7 +62,7 @@ public class JMSProducer implements ExceptionListener {
 			if (connection != null)
 				connection.close();
 		} catch (JMSException e) {
-			log.error("ftp2jms ->  jms disconnect exception " + e.getMessage());
+			log.error("ftp2jms ->  jms disconnect exception: " + e.getMessage());
 		}
 	}
 
@@ -73,7 +73,7 @@ public class JMSProducer implements ExceptionListener {
 	@Override
 	public void onException(JMSException e) {
 		log.error("ftp2jms ->  jms onException: " + e.getMessage());
-		
+
 		disconnect();
 		isConnected = false;
 	}
