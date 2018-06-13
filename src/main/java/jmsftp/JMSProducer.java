@@ -24,9 +24,11 @@ public class JMSProducer implements ExceptionListener {
 	Session session;
 	Destination destination;
 	MessageProducer producer;
+	String queue;
 	boolean isConnected = false;
 
-	public JMSProducer() {
+	public JMSProducer(String queue) {
+		this.queue = queue;
 		connectFTP();
 	}
 
@@ -39,30 +41,36 @@ public class JMSProducer implements ExceptionListener {
 	}
 
 	public void connect() {
-		log.info("ftp2jms ->  jms connect");
+		log.info("ftp2jms -> jms [" + queue + "] connect");
 		try {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
 			session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(Config.JMS.SEND_QUEUE_NAME);
+			destination = session.createQueue(queue);
 			producer = session.createProducer(destination);
 			isConnected = true;
 		} catch (JMSException e) {
-			log.error("ftp2jms ->  jms connect exception: " + e.getMessage());
+			log.error("ftp2jms -> jms [" + queue + "] connect exception: " + e.getMessage());
 		}
 	}
 
 	public void disconnect() {
-		log.info("ftp2jms ->  jms disconnect");
+		log.info("ftp2jms -> jms [" + queue + "] disconnect");
 		try {
-			if (producer != null)
+			if (producer != null) {
 				producer.close();
-			if (session != null)
+				producer = null;
+			}
+			if (session != null) {
 				session.close();
-			if (connection != null)
+				session = null;
+			}
+			if (connection != null) {
 				connection.close();
+				connection = null;
+			}
 		} catch (JMSException e) {
-			log.error("ftp2jms ->  jms disconnect exception: " + e.getMessage());
+			log.error("ftp2jms -> jms [" + queue + "] disconnect exception: " + e.getMessage());
 		}
 	}
 
@@ -72,7 +80,7 @@ public class JMSProducer implements ExceptionListener {
 
 	@Override
 	public void onException(JMSException e) {
-		log.error("ftp2jms ->  jms onException: " + e.getMessage());
+		log.error("ftp2jms -> jms [" + queue + "] onException: " + e.getMessage());
 
 		disconnect();
 		isConnected = false;

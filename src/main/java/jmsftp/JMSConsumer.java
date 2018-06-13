@@ -22,10 +22,12 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	Session session;
 	Destination destination;
 	MessageConsumer consumer;
+	String queue;
 	boolean isConnected = false;
 	boolean isReceiving = false;
 
-	public JMSConsumer() {
+	public JMSConsumer(String queue) {
+		this.queue = queue;
 		connectFTP();
 	}
 
@@ -37,23 +39,23 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	}
 
 	public void connect() {
-		log.info("jms2ftp ->  jms connect");
+		log.info("jms2ftp -> jms [" + queue + "] connect");
 		try {
 			connection = JMSConnectionFactory.getIBMMQ().createConnection();
 			connection.setExceptionListener(this);
 			session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(Config.JMS.RECV_QUEUE_NAME);
+			destination = session.createQueue(queue);
 			consumer = session.createConsumer(destination);
 			isConnected = true;
 
 			startReceive();
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms connect exception: " + e.getMessage());
+			log.error("jms2ftp -> jms [" + queue + "] connect exception: " + e.getMessage());
 		}
 	}
 
 	public void startReceive() {
-		log.info("jms2ftp ->  jms start receive");
+		log.info("jms2ftp -> jms [" + queue + "] start receive");
 		try {
 			if (consumer != null)
 				consumer.setMessageListener(this);
@@ -61,12 +63,12 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			if (connection != null)
 				connection.start();
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms start receive exception: " + e.getMessage());
+			log.error("jms2ftp -> jms [" + queue + "] start receive exception: " + e.getMessage());
 		}
 	}
 
 	public void stopReceive() {
-		log.info("jms2ftp ->  jms stop receive");
+		log.info("jms2ftp -> jms [" + queue + "] stop receive");
 		try {
 			if (consumer != null)
 				consumer.setMessageListener(null);
@@ -75,31 +77,37 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 
 			isReceiving = false;
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms stop receive exception: " + e.getMessage());
+			log.error("jms2ftp -> jms [" + queue + "] stop receive exception: " + e.getMessage());
 		} finally {
 			isReceiving = false;
 		}
 	}
 
 	public void disconnect() {
-		log.info("jms2ftp ->  jms disconnect");
+		log.info("jms2ftp -> jms [" + queue + "] disconnect");
 		try {
 			stopReceive();
 
-			if (consumer != null)
+			if (consumer != null) {
 				consumer.close();
-			if (session != null)
+				consumer = null;
+			}
+			if (session != null) {
 				session.close();
-			if (connection != null)
+				session = null;
+			}
+			if (connection != null) {
 				connection.close();
+				connection = null;
+			}
 		} catch (JMSException e) {
-			log.error("jms2ftp ->  jms disconnect exception: " + e.getMessage());
+			log.error("jms2ftp -> jms [" + queue + "] disconnect exception: " + e.getMessage());
 		}
 	}
 
 	@Override
 	public void onException(JMSException e) {
-		log.error("jms2ftp ->  jms onException: " + e.getMessage());
+		log.error("jms2ftp -> jms [" + queue + "] onException: " + e.getMessage());
 
 		disconnect();
 		isConnected = false;
@@ -108,16 +116,16 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	@Override
 	public void onMessage(Message message) {
 		try {
-			log.info("jms2ftp ->  jms get: " + message.getJMSMessageID());
+			log.info("jms2ftp -> jms [" + queue + "] get: " + message.getJMSMessageID());
 			String filename = JMSMessage.saveToFile(Config.JMS.TEMP_DIR, message);
 			client.upload(filename);
-			log.info("jms2ftp ->  ftp put: " + message.getJMSMessageID());
+			log.info("jms2ftp -> ftp put: " + message.getJMSMessageID());
 			session.commit();
-			log.info("jms2ftp ->   commit: " + message.getJMSMessageID());
+			log.info("jms2ftp -> jms [" + queue + "] commit: " + message.getJMSMessageID());
 		} catch (Exception e) {
 			try {
 				session.rollback();
-				log.error("jms2ftp -> rollback: " + message.getJMSMessageID());
+				log.error("jms2ftp -> jms [" + queue + "] rollback: " + e.getMessage());
 				try {
 					Thread.sleep(Config.COMMON.TIMEOUT);
 				} catch (InterruptedException e1) {

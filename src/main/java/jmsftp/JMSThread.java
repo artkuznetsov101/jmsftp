@@ -1,9 +1,12 @@
 package jmsftp;
 
 public class JMSThread implements Runnable {
-	JMSConsumer consumer = new JMSConsumer();
-
+	JMSConsumer consumer;
 	boolean isClosed = false;
+
+	public JMSThread(String queue) {
+		consumer = new JMSConsumer(queue);
+	}
 
 	@Override
 	public void run() {

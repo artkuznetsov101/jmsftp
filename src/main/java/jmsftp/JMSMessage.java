@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class JMSMessage {
-    private static final Logger log = LogManager.getLogger();
+	private static final Logger log = LogManager.getLogger();
 
 	public enum Type {
 		MESSAGE, TEXT, MAP, OBJECT, BYTES, STREAM
@@ -55,8 +55,8 @@ public class JMSMessage {
 		if (data != null) {
 			Files.write(Paths.get(path), data, StandardOpenOption.CREATE);
 		} else {
-			log.info("jms -> empty jms message received");
 			Files.createFile(Paths.get(path));
+			log.info("empty jms message received: " + path);
 		}
 		return filename;
 	}

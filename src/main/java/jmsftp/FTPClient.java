@@ -21,6 +21,7 @@ public class FTPClient {
 	private static final Logger log = LogManager.getLogger();
 
 	FileSystemManager manager;
+	FileSystemOptions opts;
 	FileObject remote;
 	FileObject local;
 
@@ -48,7 +49,7 @@ public class FTPClient {
 				}
 			}
 		} catch (FileSystemException e) {
-			log.error("ftp2jms ->  ftp connect exception: " + e.getMessage());
+			log.error("ftp2jms -> ftp connect exception: " + e.getMessage());
 		}
 		return null;
 	}
@@ -60,12 +61,7 @@ public class FTPClient {
 			from.close();
 			to.close();
 		} else
-			throw new FileSystemException("wrong parameters");
-
-		// TODO
-		if (to.exists() && to.isFile()) {
-			// System.out.println("");
-		}
+			throw new FileSystemException("not a file: " + from.getPublicURIString());
 	}
 
 	public void copy(FileObject from, FileObject to) throws FileSystemException {
@@ -75,12 +71,7 @@ public class FTPClient {
 			from.close();
 			to.close();
 		} else
-			throw new FileSystemException("wrong parameters");
-
-		// TODO
-		if (to.exists() && to.isFile()) {
-			// System.out.println("");
-		}
+			throw new FileSystemException("not a file: " + from.getPublicURIString());
 	}
 
 	public void delete(String path, String file) throws FileSystemException {
@@ -97,20 +88,17 @@ public class FTPClient {
 
 			from.close();
 		} else
-			throw new FileSystemException("wrong parameters");
-
-		// TODO
-		if (!from.exists() || !from.isFile()) {
-			// System.out.println("");
-		}
+			throw new FileSystemException("not a file: " + from.getPublicURIString());
 	}
 
 	public void connect(String temp, String ftp) throws FileSystemException {
+
 		manager = VFS.getManager();
 
-		FileSystemOptions opts = new FileSystemOptions();
+		opts = new FileSystemOptions();
 		FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, true);
 		FtpFileSystemConfigBuilder.getInstance().setConnectTimeout(opts, Config.COMMON.TIMEOUT);
+		FtpFileSystemConfigBuilder.getInstance().setPassiveMode(opts, true);
 
 		init(temp, ftp);
 	}
@@ -126,12 +114,13 @@ public class FTPClient {
 			if (remote == null) {
 				// getRemoteTest(ftp)
 				remote = manager.resolveFile(
-						getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp));
+						getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp),
+						opts);
 				if (!remote.isFolder())
-					throw new FileSystemException("remote path is not a directory" + ftp);
+					throw new FileSystemException("remote path is not a directory: " + ftp);
 			}
 		} catch (Exception e) {
-			log.error("ftp2jms ->  ftp connect exception: " + e.getMessage());
+			log.error("ftp2jms -> ftp connect exception: " + e.getMessage());
 		}
 	}
 
@@ -161,10 +150,10 @@ public class FTPClient {
 			}
 		}
 		if (!physical.isEmpty()) {
-			log.info("  provider Schemes: " + physical);
+			log.info("provider Schemes: " + physical);
 		}
 		if (!virtual.isEmpty()) {
-			log.info("   virtual Schemes: " + virtual);
+			log.info("virtual Schemes: " + virtual);
 		}
 	}
 
@@ -172,7 +161,7 @@ public class FTPClient {
 		try {
 			return cls.getPackage().getImplementationVersion();
 		} catch (Exception ignored) {
-			return "N/A";
+			return "n/a";
 		}
 	}
 }

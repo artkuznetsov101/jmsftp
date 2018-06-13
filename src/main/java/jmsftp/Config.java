@@ -37,7 +37,7 @@ public class Config {
 
 		static String QUEUE_MANAGER;
 		static String CHANNEL;
-		static String RECV_QUEUE_NAME;
+		static String RECV_QUEUES_NAME;
 		static String SEND_QUEUE_NAME;
 
 		static String FTP_DIR;
@@ -85,8 +85,8 @@ public class Config {
 			throw new IllegalArgumentException("JMS->QUEUE_MANAGER parameter not specified in ini file. Exit");
 		if ((Config.JMS.CHANNEL = ini.get("JMS", "CHANNEL")) == null)
 			throw new IllegalArgumentException("JMS->CHANNEL parameter not specified in ini file. Exit");
-		if ((Config.JMS.RECV_QUEUE_NAME = ini.get("JMS", "RECV_QUEUE_NAME")) == null)
-			throw new IllegalArgumentException("JMS->RECV_QUEUE_NAME parameter not specified in ini file. Exit");
+		if ((Config.JMS.RECV_QUEUES_NAME = ini.get("JMS", "RECV_QUEUES_NAME")) == null)
+			throw new IllegalArgumentException("JMS->RECV_QUEUES_NAME parameter not specified in ini file. Exit");
 		if ((Config.JMS.SEND_QUEUE_NAME = ini.get("JMS", "SEND_QUEUE_NAME")) == null)
 			throw new IllegalArgumentException("JMS->SEND_QUEUE_NAME parameter not specified in ini file. Exit");
 		if ((Config.JMS.TEMP_DIR = ini.get("JMS", "TEMP_DIR")) == null)
