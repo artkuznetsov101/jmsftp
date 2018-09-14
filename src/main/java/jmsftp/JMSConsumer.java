@@ -51,6 +51,8 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			startReceive();
 		} catch (JMSException e) {
 			log.error("jms2ftp -> jms [" + queue + "] connect exception: " + e.getMessage());
+			if (e.getCause() != null)
+				log.error("jms2ftp -> jms [" + queue + "] connect exception: " + e.getCause().getMessage());
 		}
 	}
 

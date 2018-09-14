@@ -40,6 +40,8 @@
 				<configuration>
 					<archive>
 						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib</classpathPrefix>
 							<mainClass>jmsftp.Main</mainClass>
 						</manifest>
 					</archive>
@@ -47,28 +49,15 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.7.1</version>
+				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<filters>
-								<filter>
-									<!-- filter out signature files from signed dependencies, else repackaging 
-										fails with security ex -->
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-									</excludes>
-								</filter>
-							</filters>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -120,7 +109,7 @@
 			<artifactId>log4j-api</artifactId>
 			<version>2.11.0</version>
 		</dependency>
-		
+
 		<!-- logging implementation -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

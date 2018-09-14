@@ -51,6 +51,8 @@ public class JMSProducer implements ExceptionListener {
 			isConnected = true;
 		} catch (JMSException e) {
 			log.error("ftp2jms -> jms [" + queue + "] connect exception: " + e.getMessage());
+			if (e.getCause() != null)
+				log.error("jms2ftp -> jms [" + queue + "] connect exception: " + e.getCause().getMessage());
 		}
 	}
 
