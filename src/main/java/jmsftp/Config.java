@@ -1,5 +1,11 @@
 package jmsftp;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.ini4j.Wini;
 
 public class Config {
@@ -11,7 +17,8 @@ public class Config {
 		static boolean JMS2FTP;
 		static boolean FTP2JMS;
 
-		static String FILE_NAME;
+		static String FILE_NAME_MASK;
+		static List<String> FILE_NAME_MASK_LIST;
 		static String FILE_EXTENSION;
 
 		static int TIMEOUT;
@@ -46,8 +53,10 @@ public class Config {
 
 	public static void setConfig(Wini ini) {
 		// COMMON section
-		if ((Config.COMMON.FILE_NAME = ini.get("COMMON", "FILE_NAME")) == null)
-			throw new IllegalArgumentException("COMMON->FILE_NAME parameter not specified in ini file. Exit");
+		if ((Config.COMMON.FILE_NAME_MASK = ini.get("COMMON", "FILE_MASK")) == null)
+			throw new IllegalArgumentException("COMMON->FILE_MASK parameter not specified in ini file. Exit");
+		Config.COMMON.FILE_NAME_MASK_LIST = Arrays.asList(Config.COMMON.FILE_NAME_MASK.split("\\s*,\\s*"));
+
 		if ((Config.COMMON.FILE_EXTENSION = ini.get("COMMON", "FILE_EXTENSION")) == null)
 			throw new IllegalArgumentException("COMMON->FILE_EXTENSION parameter not specified in ini file. Exit");
 
@@ -93,5 +102,18 @@ public class Config {
 			throw new IllegalArgumentException("JMS->TEMP_DIR parameter not specified in ini file. Exit");
 		if ((Config.JMS.FTP_DIR = ini.get("JMS", "FTP_DIR")) == null)
 			throw new IllegalArgumentException("JMS->FTP_DIR parameter not specified in ini file. Exit");
+	}
+
+	static String getMappedQueueName(String queue) {
+		List<String> list = new ArrayList<String>();
+		for (String item : Config.COMMON.FILE_NAME_MASK_LIST) {
+			if (queue.contains(item))
+				list.add(item);
+		}
+		if (list.isEmpty()) {
+			return queue;
+		} else {
+			return Collections.max(list, Comparator.comparing(s -> s.length()));
+		}
 	}
 }

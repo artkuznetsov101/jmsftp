@@ -113,9 +113,7 @@ public class FTPClient {
 
 			if (remote == null) {
 				// getRemoteTest(ftp)
-				remote = manager.resolveFile(
-						getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp),
-						opts);
+				remote = manager.resolveFile(getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp), opts);
 				if (!remote.isFolder())
 					throw new FileSystemException("remote path is not a directory: " + ftp);
 			}
@@ -133,16 +131,14 @@ public class FTPClient {
 	// }
 
 	public void info() throws FileSystemException {
-		log.info("default manager: \"" + manager.getClass().getName() + "\" " + "version "
-				+ getVersion(manager.getClass()));
+		log.info("default manager: \"" + manager.getClass().getName() + "\" " + "version " + getVersion(manager.getClass()));
 		String[] schemes = manager.getSchemes();
 		List<String> virtual = new ArrayList<>();
 		List<String> physical = new ArrayList<>();
 		for (int i = 0; i < schemes.length; i++) {
 			Collection<Capability> caps = manager.getProviderCapabilities(schemes[i]);
 			if (caps != null) {
-				if (caps.contains(Capability.VIRTUAL) || caps.contains(Capability.COMPRESS)
-						|| caps.contains(Capability.DISPATCHER)) {
+				if (caps.contains(Capability.VIRTUAL) || caps.contains(Capability.COMPRESS) || caps.contains(Capability.DISPATCHER)) {
 					virtual.add(schemes[i]);
 				} else {
 					physical.add(schemes[i]);

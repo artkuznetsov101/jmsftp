@@ -27,9 +27,9 @@ public class JMSMessage {
 
 	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
-	public static String saveToFile(String tempDir, Message message) throws JMSException, IOException {
+	public static String saveToFile(String tempDir, Message message, String queue) throws JMSException, IOException {
 
-		String filename = getFileName(message);
+		String filename = getFileName(message, queue);
 		String path = Paths.get(tempDir, filename).toString();
 
 		byte[] data = null;
@@ -70,9 +70,8 @@ public class JMSMessage {
 		return formatter.format(new Date());
 	}
 
-	public static String getFileName(Message message) throws JMSException {
-		return getTimestamp() + "_" + message.getJMSMessageID().replace(':', '_') + "_" + Config.COMMON.FILE_NAME + "_"
-				+ getType(message) + "." + Config.COMMON.FILE_EXTENSION;
+	public static String getFileName(Message message, String queue) throws JMSException {
+		return getTimestamp() + "_" + Config.getMappedQueueName(queue).replace(':', '_') + "_" + message.getJMSMessageID().replace(':', '_') + "." + Config.COMMON.FILE_EXTENSION;
 	}
 
 	public static Type getType(Message message) {

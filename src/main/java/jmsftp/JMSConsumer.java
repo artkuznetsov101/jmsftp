@@ -119,7 +119,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 	public void onMessage(Message message) {
 		try {
 			log.info("jms2ftp -> jms [" + queue + "] get: " + message.getJMSMessageID());
-			String filename = JMSMessage.saveToFile(Config.JMS.TEMP_DIR, message);
+			String filename = JMSMessage.saveToFile(Config.JMS.TEMP_DIR, message, queue);
 			client.upload(filename);
 			log.info("jms2ftp -> ftp put: " + message.getJMSMessageID());
 			session.commit();
