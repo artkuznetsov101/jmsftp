@@ -55,16 +55,16 @@ public class Config {
 		static String SMTP_SERVER;
 		static int SMTP_PORT;
 		static boolean SMTP_USE_SSL;
-		
+
 		static String FROM_USERNAME;
 		static String FROM_PASSWORD;
 		static String FROM_EMAIL;
-		
+
 		static String EMAIL_TO;
-		
+
 		static boolean SEND_START_EMAIL;
 	}
-	
+
 	public static void setConfig(Wini ini) {
 		// COMMON section
 		if ((Config.COMMON.FILE_NAME_MASK = ini.get("COMMON", "FILE_MASK")) == null)
@@ -116,24 +116,24 @@ public class Config {
 			throw new IllegalArgumentException("JMS->TEMP_DIR parameter not specified in ini file. Exit");
 		if ((Config.JMS.FTP_DIR = ini.get("JMS", "FTP_DIR")) == null)
 			throw new IllegalArgumentException("JMS->FTP_DIR parameter not specified in ini file. Exit");
-		
+
 		// MAIL section
 		if ((Config.MAIL.SMTP_SERVER = ini.get("MAIL", "SMTP_SERVER")) == null)
-			throw new IllegalArgumentException("MAIL->SMTP_SERVER parameter not specified in ini file. Exit");	
+			throw new IllegalArgumentException("MAIL->SMTP_SERVER parameter not specified in ini file. Exit");
 		if ((Config.MAIL.SMTP_PORT = ini.get("MAIL", "SMTP_PORT", Integer.TYPE).intValue()) == 0)
 			throw new IllegalArgumentException("MAIL->SMTP_PORT parameter not specified in ini file. Exit");
 		Config.MAIL.SMTP_USE_SSL = ini.get("MAIL", "SMTP_USE_SSL", Boolean.TYPE).booleanValue();
-		
+
 		if ((Config.MAIL.FROM_USERNAME = ini.get("MAIL", "FROM_USERNAME")) == null)
-			throw new IllegalArgumentException("MAIL->FROM_USERNAME parameter not specified in ini file. Exit");	
+			throw new IllegalArgumentException("MAIL->FROM_USERNAME parameter not specified in ini file. Exit");
 		if ((Config.MAIL.FROM_PASSWORD = ini.get("MAIL", "FROM_PASSWORD")) == null)
-			throw new IllegalArgumentException("MAIL->FROM_PASSWORD parameter not specified in ini file. Exit");	
+			throw new IllegalArgumentException("MAIL->FROM_PASSWORD parameter not specified in ini file. Exit");
 		if ((Config.MAIL.FROM_EMAIL = ini.get("MAIL", "FROM_EMAIL")) == null)
-			throw new IllegalArgumentException("MAIL->FROM_EMAIL parameter not specified in ini file. Exit");	
-		
+			throw new IllegalArgumentException("MAIL->FROM_EMAIL parameter not specified in ini file. Exit");
+
 		if ((Config.MAIL.EMAIL_TO = ini.get("MAIL", "EMAIL_TO")) == null)
-			throw new IllegalArgumentException("MAIL->EMAIL_TO parameter not specified in ini file. Exit");	
-		
+			throw new IllegalArgumentException("MAIL->EMAIL_TO parameter not specified in ini file. Exit");
+
 		Config.MAIL.SEND_START_EMAIL = ini.get("MAIL", "SEND_START_EMAIL", Boolean.TYPE).booleanValue();
 	}
 

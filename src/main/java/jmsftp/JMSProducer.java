@@ -1,9 +1,5 @@
 package jmsftp;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;

@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 
 import javax.jms.JMSException;
 
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
