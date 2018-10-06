@@ -76,8 +76,8 @@ public class JMSProducer implements ExceptionListener {
 		}
 	}
 
-	public void send(String path, String file) throws JMSException, IOException {
-		producer.send(session.createTextMessage(new String(Files.readAllBytes(Paths.get(path, file)))));
+	public void send(String data) throws JMSException {
+		producer.send(session.createTextMessage(data));
 	}
 
 	@Override

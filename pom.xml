@@ -117,6 +117,13 @@
 			<version>2.11.0</version>
 		</dependency>
 
+		<!-- email sender -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-email</artifactId>
+		    <version>1.5</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

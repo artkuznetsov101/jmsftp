@@ -117,7 +117,7 @@ public class FTPClient {
 				if (!remote.isFolder())
 					throw new FileSystemException("remote path is not a directory: " + ftp);
 			}
-		} catch (Exception e) {
+		} catch (FileSystemException e) {
 			log.error("ftp2jms -> ftp connect exception: " + e.getMessage());
 		}
 	}

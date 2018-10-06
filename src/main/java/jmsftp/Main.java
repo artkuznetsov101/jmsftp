@@ -1,16 +1,22 @@
 package jmsftp;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Wini;
 
 public class Main {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws InvalidFileFormatException, IOException, InterruptedException {
 
 		// get configuration
 		Wini ini = new Wini(new File(Config.NAME));
@@ -48,8 +54,16 @@ public class Main {
 			}
 		}
 
+		if (Config.MAIL.SEND_START_EMAIL)
+			Emailer.send("jmsftp start", "start time is " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime()));
 		if (Config.COMMON.FTP2JMS) {
 			ftpThread.join();
 		}
+	}
+
+	public static String getStackTrace(Throwable t) {
+		StringWriter sw = new StringWriter();
+		t.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
 	}
 }
