@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration shutdownHook="disable">
 	<Appenders>
-		<RollingFile name="RollingFile" fileName="jmsftp.log"
-			filePattern="jmsftp.%i.log.gz" ignoreExceptions="false">
+		<RollingFile name="RollingFile" fileName="jms2ftp.log"
+			filePattern="jms2ftp.%i.log.gz" ignoreExceptions="false">
 			<PatternLayout pattern="%d{DEFAULT} %-5level [%t] %msg%n" />
 			<Policies>
 				<OnStartupTriggeringPolicy />

@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;

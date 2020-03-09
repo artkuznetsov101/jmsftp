@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

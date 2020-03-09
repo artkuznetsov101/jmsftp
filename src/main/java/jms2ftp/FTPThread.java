@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -57,7 +57,7 @@ public class FTPThread implements Runnable {
 					}
 				}
 			} catch (IOException e) {
-				Emailer.send("jmsftp error", Main.getStackTrace(e));
+				Emailer.send("jms2ftp error", Main.getStackTrace(e));
 			} catch (JMSException e) {
 				try {
 					producer.session.rollback();

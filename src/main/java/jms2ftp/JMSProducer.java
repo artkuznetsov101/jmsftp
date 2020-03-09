@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.util.ArrayList;
 import java.util.List;

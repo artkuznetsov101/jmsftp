@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>jmsftp</groupId>
-	<artifactId>jmsftp</artifactId>
+	<groupId>jms2ftp</groupId>
+	<artifactId>jms2ftp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
@@ -29,7 +29,7 @@
 				</executions>
 				<configuration>
 					<executable>maven</executable>
-					<mainClass>jmsftp.Main</mainClass>
+					<mainClass>jms2ftp.Main</mainClass>
 				</configuration>
 			</plugin>
 
@@ -42,7 +42,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib</classpathPrefix>
-							<mainClass>jmsftp.Main</mainClass>
+							<mainClass>jms2ftp.Main</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

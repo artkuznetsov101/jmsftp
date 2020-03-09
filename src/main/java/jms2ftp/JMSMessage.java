@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.io.IOException;
 import java.nio.file.Files;

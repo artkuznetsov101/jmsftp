@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -174,7 +174,7 @@ public class JMSConsumer implements ExceptionListener, MessageListener {
 			session.commit();
 			log.info("jms [" + queues + "] commit: " + message.getJMSMessageID());
 		} catch (IOException e) {
-			Emailer.send("jmsftp error", Main.getStackTrace(e));
+			Emailer.send("jms2ftp error", Main.getStackTrace(e));
 		} catch (JMSException e) {
 			try {
 				session.rollback();

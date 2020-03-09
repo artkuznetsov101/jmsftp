@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import org.ini4j.Wini;
 
 public class Config {
 
-	public static String NAME = "jmsftp.ini";
+	public static String NAME = "jms2ftp.ini";
 
 	public static class COMMON {
 		static boolean JMS2FTP;

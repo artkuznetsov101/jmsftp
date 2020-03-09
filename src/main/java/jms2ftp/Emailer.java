@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;

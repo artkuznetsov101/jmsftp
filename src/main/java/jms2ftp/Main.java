@@ -1,4 +1,4 @@
-package jmsftp;
+package jms2ftp;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class Main {
 		}
 
 		if (Config.MAIL.SEND_START_EMAIL)
-			Emailer.send("jmsftp start", "start time is "
+			Emailer.send("jms2ftp start", "start time is "
 					+ new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime()));
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
