@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.ini4j.Ini;
 import org.ini4j.Wini;
 
 public class Config {
@@ -13,9 +14,11 @@ public class Config {
 	public static String NAME = "jmsftp.ini";
 
 	public static class COMMON {
-
 		static boolean JMS2FTP;
 		static boolean FTP2JMS;
+		static int SECTION_MAX;
+
+		static String TEMP_DIR;
 
 		static String FILE_NAME_MASK;
 		static List<String> FILE_NAME_MASK_LIST;
@@ -30,9 +33,6 @@ public class Config {
 
 		static String USERNAME;
 		static String PASSWORD;
-
-		static String FTP_DIR;
-		static String TEMP_DIR;
 	}
 
 	public static class JMS {
@@ -44,11 +44,6 @@ public class Config {
 
 		static String QUEUE_MANAGER;
 		static String CHANNEL;
-		static String RECV_QUEUES_NAME;
-		static String SEND_QUEUE_NAME;
-
-		static String FTP_DIR;
-		static String TEMP_DIR;
 	}
 
 	public static class MAIL {
@@ -65,7 +60,34 @@ public class Config {
 		static boolean SEND_START_EMAIL;
 	}
 
+	public static class FTP2JMS {
+		static List<Section> sections = new ArrayList<Section>();
+	}
+
+	public static class JMS2FTP {
+		static List<Section> sections = new ArrayList<Section>();
+	}
+
+	public static class Section {
+
+		String NAME;
+		String FTP_DIR;
+		String JMS_QUEUES;
+
+		Section(String NAME, String FTP_DIR, String JMS_QUEUES) {
+			this.NAME = NAME;
+			this.FTP_DIR = FTP_DIR;
+			this.JMS_QUEUES = JMS_QUEUES;
+		}
+
+		@Override
+		public String toString() {
+			return "Section [NAME=" + NAME + ", FTP_DIR=" + FTP_DIR + ", JMS_QUEUES=" + JMS_QUEUES + "]";
+		}
+	}
+
 	public static void setConfig(Wini ini) {
+
 		// COMMON section
 		if ((Config.COMMON.FILE_NAME_MASK = ini.get("COMMON", "FILE_MASK")) == null)
 			throw new IllegalArgumentException("COMMON->FILE_MASK parameter not specified in ini file. Exit");
@@ -80,6 +102,12 @@ public class Config {
 		if ((Config.COMMON.TIMEOUT = ini.get("COMMON", "TIMEOUT", Integer.TYPE).intValue()) == 0)
 			throw new IllegalArgumentException("COMMON->TIMEOUT parameter not specified in ini file. Exit");
 
+		if ((Config.COMMON.SECTION_MAX = ini.get("COMMON", "SECTION_MAX", Integer.TYPE).intValue()) == 0)
+			throw new IllegalArgumentException("COMMON->SECTION_MAX parameter not specified in ini file. Exit");
+
+		if ((Config.COMMON.TEMP_DIR = ini.get("COMMON", "TEMP_DIR")) == null)
+			throw new IllegalArgumentException("COMMON->TEMP_DIR parameter not specified in ini file. Exit");
+
 		// FTP section
 		if ((Config.FTP.HOST = ini.get("FTP", "HOST")) == null)
 			throw new IllegalArgumentException("FTP->HOST parameter not specified in ini file. Exit");
@@ -89,10 +117,6 @@ public class Config {
 			throw new IllegalArgumentException("FTP->USERNAME parameter not specified in ini file. Exit");
 		if ((Config.FTP.PASSWORD = ini.get("FTP", "PASSWORD")) == null)
 			throw new IllegalArgumentException("FTP->PASSWORD parameter not specified in ini file. Exit");
-		if ((Config.FTP.FTP_DIR = ini.get("FTP", "FTP_DIR")) == null)
-			throw new IllegalArgumentException("FTP->FTP_DIR parameter not specified in ini file. Exit");
-		if ((Config.FTP.TEMP_DIR = ini.get("FTP", "TEMP_DIR")) == null)
-			throw new IllegalArgumentException("FTP->TEMP_DIR parameter not specified in ini file. Exit");
 
 		// JMS section
 		if ((Config.JMS.HOST = ini.get("JMS", "HOST")) == null)
@@ -108,14 +132,6 @@ public class Config {
 			throw new IllegalArgumentException("JMS->QUEUE_MANAGER parameter not specified in ini file. Exit");
 		if ((Config.JMS.CHANNEL = ini.get("JMS", "CHANNEL")) == null)
 			throw new IllegalArgumentException("JMS->CHANNEL parameter not specified in ini file. Exit");
-		if ((Config.JMS.RECV_QUEUES_NAME = ini.get("JMS", "RECV_QUEUES_NAME")) == null)
-			throw new IllegalArgumentException("JMS->RECV_QUEUES_NAME parameter not specified in ini file. Exit");
-		if ((Config.JMS.SEND_QUEUE_NAME = ini.get("JMS", "SEND_QUEUE_NAME")) == null)
-			throw new IllegalArgumentException("JMS->SEND_QUEUE_NAME parameter not specified in ini file. Exit");
-		if ((Config.JMS.TEMP_DIR = ini.get("JMS", "TEMP_DIR")) == null)
-			throw new IllegalArgumentException("JMS->TEMP_DIR parameter not specified in ini file. Exit");
-		if ((Config.JMS.FTP_DIR = ini.get("JMS", "FTP_DIR")) == null)
-			throw new IllegalArgumentException("JMS->FTP_DIR parameter not specified in ini file. Exit");
 
 		// MAIL section
 		if ((Config.MAIL.SMTP_SERVER = ini.get("MAIL", "SMTP_SERVER")) == null)
@@ -135,6 +151,24 @@ public class Config {
 			throw new IllegalArgumentException("MAIL->EMAIL_TO parameter not specified in ini file. Exit");
 
 		Config.MAIL.SEND_START_EMAIL = ini.get("MAIL", "SEND_START_EMAIL", Boolean.TYPE).booleanValue();
+
+		// FTP2JMS sections
+		for (int i = 1; i < Config.COMMON.SECTION_MAX; i++) {
+			Ini.Section s = ini.get(Config.FTP2JMS.class.getSimpleName() + "_" + i);
+			if (s != null) {
+				Config.Section section = new Config.Section(s.getName(), s.get("FTP_DIR"), s.get("JMS_QUEUES"));
+				Config.FTP2JMS.sections.add(section);
+			}
+		}
+
+		// JMS2FTP sections
+		for (int i = 1; i < Config.COMMON.SECTION_MAX; i++) {
+			Ini.Section s = ini.get(Config.JMS2FTP.class.getSimpleName() + "_" + i);
+			if (s != null) {
+				Config.Section section = new Config.Section(s.getName(), s.get("FTP_DIR"), s.get("JMS_QUEUES"));
+				Config.JMS2FTP.sections.add(section);
+			}
+		}
 	}
 
 	static String getMappedQueueName(String queue) {

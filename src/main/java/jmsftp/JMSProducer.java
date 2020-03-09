@@ -1,5 +1,8 @@
 package jmsftp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
@@ -14,50 +17,72 @@ import org.apache.logging.log4j.Logger;
 public class JMSProducer implements ExceptionListener {
 	private static final Logger log = LogManager.getLogger();
 
-	FTPClient client = new FTPClient();
+	FTPClient client;
+	String ftp;
 
 	Connection connection;
 	Session session;
-	Destination destination;
-	MessageProducer producer;
-	String queue;
+	List<MessageProducer> producers = new ArrayList<>();
+	List<String> queues;
+
+	String temp;
+
 	boolean isConnected = false;
 
-	public JMSProducer(String queue) {
-		this.queue = queue;
+	public JMSProducer(String ftp, List<String> queues, String temp) {
+		this.ftp = ftp;
+		this.queues = queues;
+		this.temp = temp;
+
+		client = new FTPClient(ftp, temp);
 		connectFTP();
 	}
 
 	public void connectFTP() {
 		try {
-			client.connect(Config.FTP.TEMP_DIR, Config.FTP.FTP_DIR);
+			client.connect(temp, ftp);
 		} catch (FileSystemException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void connect() {
-		log.info("ftp2jms -> jms [" + queue + "] connect");
+		log.info("jms [" + queues + "] connect");
 		try {
-			connection = JMSConnectionFactory.getIBMMQ().createConnection();
+			connection = JMSConnectionFactory.getIBMMQFactory().createConnection();
 			connection.setExceptionListener(this);
 			session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createQueue(queue);
-			producer = session.createProducer(destination);
+
+			queues.forEach(queue -> {
+				try {
+					Destination destination = session.createQueue(queue);
+					MessageProducer producer = session.createProducer(destination);
+					producers.add(producer);
+				} catch (JMSException e) {
+					log.error(e);
+				}
+			});
+
 			isConnected = true;
 		} catch (JMSException e) {
-			log.error("ftp2jms -> jms [" + queue + "] connect exception: " + e.getMessage());
+			log.error("jms [" + queues + "] connect exception: " + e.getMessage());
 			if (e.getCause() != null)
-				log.error("jms2ftp -> jms [" + queue + "] connect exception: " + e.getCause().getMessage());
+				log.error("jms [" + queues + "] connect exception: " + e.getCause().getMessage());
 		}
 	}
 
 	public void disconnect() {
-		log.info("ftp2jms -> jms [" + queue + "] disconnect");
+		log.info("jms [" + queues + "] disconnect");
 		try {
-			if (producer != null) {
-				producer.close();
-				producer = null;
+			if (producers != null && !producers.isEmpty()) {
+				producers.forEach(producer -> {
+					try {
+						producer.close();
+					} catch (JMSException e) {
+						log.error(e);
+					}
+				});
+				producers.clear();
 			}
 			if (session != null) {
 				session.close();
@@ -68,17 +93,24 @@ public class JMSProducer implements ExceptionListener {
 				connection = null;
 			}
 		} catch (JMSException e) {
-			log.error("ftp2jms -> jms [" + queue + "] disconnect exception: " + e.getMessage());
+			log.error("jms [" + queues + "] disconnect exception: " + e.getMessage());
 		}
 	}
 
 	public void send(String data) throws JMSException {
-		producer.send(session.createTextMessage(data));
+
+		producers.forEach(producer -> {
+			try {
+				producer.send(session.createTextMessage(data));
+			} catch (JMSException e) {
+				log.error(e);
+			}
+		});
 	}
 
 	@Override
 	public void onException(JMSException e) {
-		log.error("ftp2jms -> jms [" + queue + "] onException: " + e.getMessage());
+		log.error("jms [" + queues + "] onException: " + e.getMessage());
 
 		disconnect();
 		isConnected = false;

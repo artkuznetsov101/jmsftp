@@ -71,7 +71,8 @@ public class JMSMessage {
 	}
 
 	public static String getFileName(Message message, String queue) throws JMSException {
-		return getTimestamp() + "_" + Config.getMappedQueueName(queue).replace(':', '_') + "_" + message.getJMSMessageID().replace(':', '_') + "." + Config.COMMON.FILE_EXTENSION;
+		return getTimestamp() + "_" + Config.getMappedQueueName(queue).replace(':', '_') + "_"
+				+ message.getJMSMessageID().replace(':', '_') + "." + Config.COMMON.FILE_EXTENSION;
 	}
 
 	public static Type getType(Message message) {

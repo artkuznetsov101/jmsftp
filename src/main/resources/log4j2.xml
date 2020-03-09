@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
-  <Appenders>
-    <File name="File" fileName="jmsftp.log">
-		<PatternLayout pattern="%d{DEFAULT} %-5level %msg%n"/>
-    </File>
-	<Console name="Console" target="SYSTEM_OUT">
-		<PatternLayout pattern="%d{DEFAULT} %-5level %msg%n"/>
-	</Console>
-  </Appenders>
-  <Loggers>
-    <Root level="all" additivity="true">
-      <AppenderRef ref="File"/>
-      <AppenderRef ref="Console"/>
-    </Root>
-  </Loggers>
-</Configuration> 
+<Configuration shutdownHook="disable">
+	<Appenders>
+		<RollingFile name="RollingFile" fileName="jmsftp.log"
+			filePattern="jmsftp.%i.log.gz" ignoreExceptions="false">
+			<PatternLayout pattern="%d{DEFAULT} %-5level [%t] %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="9" />
+		</RollingFile>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{DEFAULT} %-5level [%t] %msg%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		<AsyncRoot level="all" additivity="true">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="Console" />
+		</AsyncRoot>
+	</Loggers>
+</Configuration>

@@ -25,13 +25,21 @@ public class FTPClient {
 	FileObject remote;
 	FileObject local;
 
+	String ftp;
+	String temp;
+
+	public FTPClient(String ftp, String temp) {
+		this.ftp = ftp;
+		this.temp = temp;
+	}
+
 	public void upload(String filename) throws FileSystemException {
-		init(Config.JMS.TEMP_DIR, Config.JMS.FTP_DIR);
+		init(temp, ftp);
 		move(local.resolveFile(filename), remote.resolveFile(filename));
 	}
 
 	public void download(String filename) throws FileSystemException {
-		init(Config.FTP.TEMP_DIR, Config.FTP.FTP_DIR);
+		init(temp, ftp);
 		copy(remote.resolveFile(filename), local.resolveFile(filename));
 	}
 
@@ -42,14 +50,17 @@ public class FTPClient {
 				remote.refresh();
 				final FileObject[] children = remote.getChildren();
 				for (final FileObject child : children) {
-					String filename = child.getName().getBaseName();
-					download(filename);
-					return filename;
-
+					if (child.isFile()) {
+						String filename = child.getName().getBaseName();
+						download(filename);
+						return filename;
+					} else {
+						continue;
+					}
 				}
 			}
 		} catch (FileSystemException e) {
-			log.error("ftp2jms -> ftp connect exception: " + e.getMessage());
+			log.error("ftp [" + ftp + "] connect exception: " + e.getMessage());
 		}
 		return null;
 	}
@@ -113,12 +124,14 @@ public class FTPClient {
 
 			if (remote == null) {
 				// getRemoteTest(ftp)
-				remote = manager.resolveFile(getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp), opts);
+				remote = manager.resolveFile(
+						getRemoteFTP(Config.FTP.HOST, Config.FTP.PORT, Config.FTP.USERNAME, Config.FTP.PASSWORD, ftp),
+						opts);
 				if (!remote.isFolder())
 					throw new FileSystemException("remote path is not a directory: " + ftp);
 			}
 		} catch (FileSystemException e) {
-			log.error("ftp2jms -> ftp connect exception: " + e.getMessage());
+			log.error("ftp [" + ftp + "] connect exception: " + e.getMessage());
 		}
 	}
 
@@ -131,14 +144,16 @@ public class FTPClient {
 	// }
 
 	public void info() throws FileSystemException {
-		log.info("default manager: \"" + manager.getClass().getName() + "\" " + "version " + getVersion(manager.getClass()));
+		log.info("default manager: \"" + manager.getClass().getName() + "\" " + "version "
+				+ getVersion(manager.getClass()));
 		String[] schemes = manager.getSchemes();
 		List<String> virtual = new ArrayList<>();
 		List<String> physical = new ArrayList<>();
 		for (int i = 0; i < schemes.length; i++) {
 			Collection<Capability> caps = manager.getProviderCapabilities(schemes[i]);
 			if (caps != null) {
-				if (caps.contains(Capability.VIRTUAL) || caps.contains(Capability.COMPRESS) || caps.contains(Capability.DISPATCHER)) {
+				if (caps.contains(Capability.VIRTUAL) || caps.contains(Capability.COMPRESS)
+						|| caps.contains(Capability.DISPATCHER)) {
 					virtual.add(schemes[i]);
 				} else {
 					physical.add(schemes[i]);

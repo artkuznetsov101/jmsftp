@@ -3,6 +3,7 @@ package jmsftp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.jms.JMSException;
 
@@ -13,12 +14,19 @@ public class FTPThread implements Runnable {
 	private static final Logger log = LogManager.getLogger();
 
 	JMSProducer producer;
-	String queue;
+
+	String ftp;
+	List<String> queues;
+	String temp;
+
 	boolean isClosed = false;
 
-	public FTPThread(String queue) {
-		this.queue = queue;
-		producer = new JMSProducer(queue);
+	public FTPThread(String ftp, List<String> queues, String temp) {
+		this.ftp = ftp;
+		this.queues = queues;
+		this.temp = temp;
+
+		producer = new JMSProducer(ftp, queues, temp);
 	}
 
 	@Override
@@ -35,13 +43,13 @@ public class FTPThread implements Runnable {
 
 			try {
 				if (producer.isConnected == true && (file = producer.client.get()) != null) {
-					log.info("ftp2jms -> ftp get: " + file);
-					producer.send(new String(Files.readAllBytes(Paths.get(Config.FTP.TEMP_DIR, file))));
-					log.info("ftp2jms -> jms [" + queue + "] put: " + file);
-					producer.client.delete(Config.FTP.TEMP_DIR, file);
+					log.info("ftp [" + ftp + "] get: " + file);
+					producer.send(new String(Files.readAllBytes(Paths.get(temp, file))));
+					log.info("jms [" + queues + "] put: " + file);
+					producer.client.delete(temp, file);
 					producer.client.delete(file);
 					producer.session.commit();
-					log.info("ftp2jms -> jms [" + queue + "] commit: " + file);
+					log.info("jms [" + queues + "] commit: " + file);
 				} else {
 					try {
 						Thread.sleep(Config.COMMON.TIMEOUT);
@@ -53,7 +61,7 @@ public class FTPThread implements Runnable {
 			} catch (JMSException e) {
 				try {
 					producer.session.rollback();
-					log.error("ftp2jms -> jms [" + queue + "] rollback: " + e.getMessage());
+					log.error("jms [" + queues + "] rollback: " + e.getMessage());
 					try {
 						Thread.sleep(Config.COMMON.TIMEOUT);
 					} catch (InterruptedException e1) {

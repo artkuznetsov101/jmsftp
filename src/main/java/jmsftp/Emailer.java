@@ -22,9 +22,9 @@ public class Emailer {
 			email.setSubject(subject);
 			email.setMsg(message);
 			email.send();
-			log.info("ftp2jms -> " + subject + " report email successfully sended");
+			log.info(subject + " report email successfully sended");
 		} catch (EmailException e) {
-			log.error("ftp2jms -> report email not sended: " + e.getMessage());
+			log.error("report email not sended: " + e.getMessage());
 		}
 	}
 }

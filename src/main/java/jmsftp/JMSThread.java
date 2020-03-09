@@ -1,11 +1,15 @@
 package jmsftp;
 
+import java.util.List;
+
 public class JMSThread implements Runnable {
+
 	JMSConsumer consumer;
+
 	boolean isClosed = false;
 
-	public JMSThread(String queue) {
-		consumer = new JMSConsumer(queue);
+	public JMSThread(List<String> queues, String ftp, String temp) {
+		consumer = new JMSConsumer(queues, ftp, temp);
 	}
 
 	@Override
